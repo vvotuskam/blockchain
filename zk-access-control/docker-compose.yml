@@ -1,0 +1,24 @@
+services:
+  besu:
+    image: hyperledger/besu:latest
+    container_name: besu-node
+    ports:
+      - "8545:8545"
+    command:
+      - --network=dev
+      - --rpc-http-enabled
+      - --rpc-http-api=ETH,NET,WEB3
+      - --rpc-http-cors-origins=["*"]
+      - --host-allowlist=["*"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8545"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  ipfs:
+    image: ipfs/kubo:latest
+    container_name: ipfs-node
+    ports:
+      - "5001:5001"
+      - "8080:8080"
