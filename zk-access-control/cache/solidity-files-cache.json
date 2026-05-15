@@ -1,8 +1,8 @@
 {
   "_format": "hh-sol-cache-2",
   "files": {
-    "C:\\Users\\asula\\IdeaProjects\\blockchain\\zk-access-control\\contracts\\AccessManager.sol": {
-      "lastModificationDate": 1778782561110,
+    "/Users/maksut/IdeaProjects/blockchain-win/zk-access-control/contracts/AccessManager.sol": {
+      "lastModificationDate": 1778785492417,
       "contentHash": "2db807571573815fc3bda5082f06579b",
       "sourceName": "contracts/AccessManager.sol",
       "solcConfig": {
@@ -39,8 +39,8 @@
         "AccessManager"
       ]
     },
-    "C:\\Users\\asula\\IdeaProjects\\blockchain\\zk-access-control\\contracts\\Verifier.sol": {
-      "lastModificationDate": 1778782561071,
+    "/Users/maksut/IdeaProjects/blockchain-win/zk-access-control/contracts/Verifier.sol": {
+      "lastModificationDate": 1778785492417,
       "contentHash": "52d97a37b56125060cdc7cabb5c7c448",
       "sourceName": "contracts/Verifier.sol",
       "solcConfig": {

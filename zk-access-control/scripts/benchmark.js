@@ -10,6 +10,7 @@ async function main() {
     console.log("Using Account:", deployer.address);
 
     // 1. Setup Data & Crypto
+    console.log("Setup Data & Crypto")
     const poseidon = await buildPoseidon();
     const roleId = 1;
     const secretKey = 12345;
@@ -17,6 +18,7 @@ async function main() {
     const publicCommitment = poseidon.F.toObject(hashResult).toString();
 
     // 2. Generate Proof
+    console.log("Generate Proof")
     const wasmPath = fs.existsSync("circuit_js/circuit.wasm") ? "circuit_js/circuit.wasm" : "circuit.wasm";
     const startTimeProof = performance.now();
     const { proof, publicSignals } = await snarkjs.groth16.fullProve(
@@ -30,13 +32,25 @@ async function main() {
     const parsedCallData = JSON.parse("[" + callData + "]");
 
     // 3. Deploy
+    console.log("Verifier 1")
     const Verifier = await hre.ethers.getContractFactory("Groth16Verifier");
+
+    console.log("Verifier 2")
     const verifier = await Verifier.deploy();
-    await verifier.waitForDeployment();
+
+    console.log("Verifier 3")
+    await verifier.deploymentTransaction().wait(1);
+
+    console.log("Verifier 4")
     const AccessManager = await hre.ethers.getContractFactory("AccessManager");
+
+    console.log("Verifier 5")
     const accessManager = await AccessManager.deploy(await verifier.getAddress());
+
+    console.log("Verifier 6")
     await accessManager.waitForDeployment();
 
+    console.log("Verifier 7")
     await (await accessManager.updateCommitment(publicCommitment)).wait();
 
     // 4. The Benchmark

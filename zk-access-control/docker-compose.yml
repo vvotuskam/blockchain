@@ -1,24 +1,120 @@
+name: win
+
 services:
-  besu:
-    image: hyperledger/besu:latest
-    container_name: besu-node
+  besu-node1:
+    image: hyperledger/besu:23.4.4
+    container_name: besu-node1
+    networks:
+      besu-net:
+        ipv4_address: 172.16.239.11
     ports:
       - "8545:8545"
+      - "30303:30303"
     command:
       - --network=dev
-      - --rpc-http-enabled
-      - --rpc-http-api=ETH,NET,WEB3
-      - --rpc-http-cors-origins=["*"]
-      - --host-allowlist=["*"]
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8545"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
+      - --rpc-http-enabled=true
+      - --rpc-http-api=ETH,NET,WEB3,DEBUG,ADMIN,TXPOOL,MINER
+      - --rpc-http-host=0.0.0.0
+      - --rpc-http-cors-origins=all
+      - --host-allowlist=*
+      # Настройки для стресс-теста:
+      - --target-gas-limit=30000000
+      - --tx-pool-limit-by-account-percentage=1.0
+      - --tx-pool-max-size=2000
+      - --miner-enabled=true
+      - --miner-coinbase=0xFE3B557E8Fb62b89F4916B721be55cEb828dBd73
+      - --p2p-enabled=true
+      - --p2p-interface=0.0.0.0
+      - --p2p-host=172.16.239.11
+      - --nat-method=NONE
+#    healthcheck:
+#      test: ["CMD-SHELL", "curl -X POST -H 'Content-Type: application/json' --data '{\"jsonrpc\":\"2.0\",\"method\":\"eth_blockNumber\",\"params\":[],\"id\":1}' http://localhost:8545"]
+#      interval: 10s
+#      timeout: 5s
+#      retries: 15
+#      start_period: 20s
+
+  besu-node2:
+    image: hyperledger/besu:23.4.4
+    container_name: besu-node2
+    networks:
+      besu-net:
+        ipv4_address: 172.16.239.12
+    depends_on:
+      besu-node1:
+        condition: service_healthy
+    command:
+      - --network=dev
+      - --miner-enabled=true
+      - --miner-coinbase=0xFE3B557E8Fb62b89F4916B721be55cEb828dBd73
+      - --target-gas-limit=30000000
+      - --tx-pool-limit-by-account-percentage=1.0
+      - --p2p-enabled=true
+      - --p2p-interface=0.0.0.0
+      - --p2p-host=172.16.239.12
+      - --nat-method=NONE
+      - --bootnodes=enode://00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000@172.16.239.11:30303
+
+  besu-node3:
+    image: hyperledger/besu:23.4.4
+    container_name: besu-node3
+    networks:
+      besu-net:
+        ipv4_address: 172.16.239.13
+    depends_on:
+      besu-node1:
+        condition: service_healthy
+    command:
+      - --network=dev
+      - --miner-enabled=true
+      - --miner-coinbase=0xFE3B557E8Fb62b89F4916B721be55cEb828dBd73
+      - --target-gas-limit=30000000
+      - --tx-pool-limit-by-account-percentage=1.0
+      - --p2p-enabled=true
+      - --p2p-interface=0.0.0.0
+      - --p2p-host=172.16.239.13
+      - --nat-method=NONE
+      - --bootnodes=enode://00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000@172.16.239.11:30303
+
+  besu-node4:
+    image: hyperledger/besu:23.4.4
+    container_name: besu-node4
+    networks:
+      besu-net:
+        ipv4_address: 172.16.239.14
+    depends_on:
+      besu-node1:
+        condition: service_healthy
+    command:
+      - --network=dev
+      - --miner-enabled=true
+      - --miner-coinbase=0xFE3B557E8Fb62b89F4916B721be55cEb828dBd73
+      - --target-gas-limit=30000000
+      - --tx-pool-limit-by-account-percentage=1.0
+      - --p2p-enabled=true
+      - --p2p-interface=0.0.0.0
+      - --p2p-host=172.16.239.14
+      - --nat-method=NONE
+      - --bootnodes=enode://00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000@172.16.239.11:30303
 
   ipfs:
     image: ipfs/kubo:latest
     container_name: ipfs-node
+    environment:
+      - IPFS_PROFILE=server
+    networks:
+      besu-net:
+        ipv4_address: 172.16.239.20
     ports:
       - "5001:5001"
       - "8080:8080"
+    volumes:
+      - ./ipfs-data:/export
+      - ./ipfs-staging:/data/ipfs
+
+networks:
+  besu-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.16.239.0/24
