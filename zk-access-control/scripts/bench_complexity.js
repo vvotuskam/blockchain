@@ -5,7 +5,7 @@ const fs = require("fs");
 
 async function main() {
     // The pre-compiled depths we are testing
-    const depths = [5, 10, 20];
+    const depths = [5, 20, 50, 100, 200, 500, 1000];
     const poseidon = await buildPoseidon();
     const F = poseidon.F;
 
@@ -67,13 +67,12 @@ async function main() {
 
             console.log(
                 depth.toString().padEnd(8) +
-                "| " + constraints.toString().padEnd(13) +
+                // "| " + constraints.toString().padEnd(1) +
                 "| " + durationMs
             );
         } catch (error) {
             console.log(
-                depth.toString().padEnd(8) +
-                "| " + constraints.toString().padEnd(13) +
+                error.message +
                 "| ERROR: Missing artifacts or invalid data"
             );
         }
